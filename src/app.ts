@@ -12,15 +12,13 @@ const app: Application = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: [
-      'http://localhost:5173',
-    ],
+    origin: ['http://localhost:5173'],
     credentials: true,
   }),
 );
 app.use(cookieParser());
 
-// rate limiting for every api
+// rate limiter middleware
 app.use(limiter);
 
 // application routes
@@ -35,9 +33,9 @@ const homeRoute = async (req: Request, res: Response) => {
 
 app.get('/', homeRoute);
 
-// global error handle
+// global error handler
 app.use(globalErrorHandler);
-// not found route
+// global not found route
 app.all('*', notFoundRoute);
 
 export default app;

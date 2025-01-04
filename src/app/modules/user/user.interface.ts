@@ -7,7 +7,9 @@ export type TUser = {
   email: string;
   password: string;
   phone: string;
-  role?: keyof typeof USER_ROLE;
+  role?: TUserRole;
   address: string;
   isDeleted: boolean;
 };
+
+export type TUserRole = keyof typeof USER_ROLE;

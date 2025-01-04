@@ -1,5 +1,5 @@
 import httpStatus from 'http-status';
-import { TUser } from '../user/user.interface';
+import { TUser, TUserRole } from '../user/user.interface';
 import { User } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
 import {
@@ -37,7 +37,7 @@ const signupIntoDB = async (payload: TUser) => {
   // jwt payload
   const jwtPayload = {
     email: data.email,
-    role: data.role as keyof typeof USER_ROLE,
+    role: data.role as TUserRole,
   };
 
   // create jwt access token
@@ -100,7 +100,7 @@ const login = async (payload: TLoginUser) => {
   // jwt payload
   const jwtPayload = {
     email: isExistsUser.email,
-    role: isExistsUser.role as keyof typeof USER_ROLE,
+    role: isExistsUser.role as TUserRole,
   };
 
   // create jwt access token
@@ -125,7 +125,7 @@ const refreshToken = async (token: string) => {
   // jwt payload
   const jwtPayload = {
     email: isExistsUser.email,
-    role: isExistsUser.role as keyof typeof USER_ROLE,
+    role: isExistsUser.role as TUserRole,
   };
 
   // create jwt access token

@@ -1,4 +1,4 @@
-import { USER_ROLE } from '../user/user.constant';
+import { TUserRole } from '../user/user.interface';
 
 export type TLoginUser = {
   email: string;
@@ -7,5 +7,5 @@ export type TLoginUser = {
 
 export type TJwtPayload = {
   email: string;
-  role: keyof typeof USER_ROLE;
+  role: TUserRole;
 };

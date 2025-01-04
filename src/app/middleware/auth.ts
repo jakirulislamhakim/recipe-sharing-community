@@ -3,10 +3,10 @@ import AppError from '../errors/AppError';
 import catchAsync from '../utils/catchAsync';
 import { JwtPayload } from 'jsonwebtoken';
 import { User } from '../modules/user/user.model';
-import { USER_ROLE } from '../modules/user/user.constant';
 import { decodedAccessToken } from '../modules/auth/auth.utils';
+import { TUserRole } from '../modules/user/user.interface';
 
-const auth = (...requiredRole: (keyof typeof USER_ROLE)[]) => {
+const auth = (...requiredRole: TUserRole[]) => {
   return catchAsync(async (req, res, next) => {
     const token = req.headers.authorization;
     if (!token) {
@@ -40,7 +40,7 @@ const auth = (...requiredRole: (keyof typeof USER_ROLE)[]) => {
       );
     }
 
-    // attach user info in request 
+    // attach user info in request
     req.user = user;
 
     next();

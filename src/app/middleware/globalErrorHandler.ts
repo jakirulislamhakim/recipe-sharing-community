@@ -72,7 +72,7 @@ const globalErrorHandler: ErrorRequestHandler = (
     success: false,
     message,
     errorSources,
-    // err, //!full error source for when use dev
+    // err, //! only for development purpose
     stack: config.NODE_ENV === 'development' ? err?.stack : null,
   });
 };
