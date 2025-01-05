@@ -18,7 +18,8 @@ const globalErrorHandler: ErrorRequestHandler = (
 ) => {
   // setting default values
   let statusCode: number = err.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
-  let message: string = err.message || 'Unexpected error occurred!!';
+  let message: string =
+    err.message || 'An unexpected error occurred. Please try again later.';
 
   // default errorSource value
   let errorSources: TErrorSources = [

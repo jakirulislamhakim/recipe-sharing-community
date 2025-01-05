@@ -22,5 +22,4 @@ router.get(
   UserController.getMe,
 );
 
-const UserRoutes = router;
-export default UserRoutes;
+export const UserRoutes = router;

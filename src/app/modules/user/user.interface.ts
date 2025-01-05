@@ -3,12 +3,15 @@ import { USER_ROLE } from './user.constant';
 
 export type TUser = {
   _id: Types.ObjectId;
-  name: string;
+  fullName: string;
+  username: string;
   email: string;
   password: string;
-  phone: string;
-  role?: TUserRole;
-  address: string;
+  profileImage: string;
+  bio: string;
+  role: TUserRole;
+  isUserPremium: boolean;
+  passwordChangeAt: Date;
   isDeleted: boolean;
 };
 

@@ -5,6 +5,9 @@ import notFoundRoute from './app/middleware/notFoundRoute';
 import cookieParser from 'cookie-parser';
 import { ModulesRoutes } from './app/routes';
 import limiter from './app/middleware/limiter';
+import YAML from 'yamljs';
+import swaggerUi from 'swagger-ui-express';
+import path from 'path';
 
 const app: Application = express();
 
@@ -17,6 +20,12 @@ app.use(
   }),
 );
 app.use(cookieParser());
+
+// swagger docs
+// eslint-disable-next-line no-undef
+const swaggerPath = path.resolve(__dirname, './docs/swagger.yaml');
+const swaggerDocument = YAML.load(swaggerPath);
+app.use('/api-docs/v1', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // rate limiter middleware
 app.use(limiter);

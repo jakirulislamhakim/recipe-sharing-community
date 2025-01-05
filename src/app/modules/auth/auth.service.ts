@@ -11,19 +11,26 @@ import {
 } from './auth.utils';
 import AppError from '../../errors/AppError';
 import { USER_ROLE } from '../user/user.constant';
+import { generateUniqueUsername } from '../user/user.util';
 
-const signupIntoDB = async (payload: TUser) => {
+const userRegistrationIntoDB = async (payload: TUser) => {
   const { password, ...remainingPayload } = payload;
 
   // check the user is already exists
   const isExistsUser = await User.findOne({ email: payload.email });
   if (isExistsUser) {
-    throw new AppError(httpStatus.CONFLICT, 'The user email is already exists');
+    throw new AppError(
+      httpStatus.CONFLICT,
+      `A user with this email already exists.`,
+    );
   }
 
   const hashPassword = await bcryptHashPassword(password);
   // set user role
   remainingPayload.role = USER_ROLE.user;
+  // generate unique username
+  const username = await generateUniqueUsername(payload.fullName);
+  remainingPayload.username = username;
 
   const data = await User.create({
     password: hashPassword,
@@ -46,9 +53,9 @@ const signupIntoDB = async (payload: TUser) => {
   const refreshToken = createJwtRefreshToken(jwtPayload);
 
   return {
+    data,
     accessToken,
     refreshToken,
-    data,
   };
 };
 
@@ -135,7 +142,7 @@ const refreshToken = async (token: string) => {
 };
 
 export const AuthServices = {
-  signupIntoDB,
+  userRegistrationIntoDB,
   createAdminByAdminIntoDB,
   login,
   refreshToken,

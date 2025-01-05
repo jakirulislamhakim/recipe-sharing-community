@@ -4,42 +4,60 @@ import { USER_ROLE } from './user.constant';
 
 const userSchema = new Schema<TUser>(
   {
-    name: {
+    fullName: {
       type: String,
       required: true,
+      trim: true,
+    },
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
     },
     email: {
       type: String,
       required: true,
       unique: true,
+      trim: true,
     },
     password: {
       type: String,
       required: true,
       select: false,
+      trim: true,
     },
-    phone: {
+    profileImage: {
       type: String,
       required: true,
+      default: 'https://i.ibb.co.com/4jr3Rn6/no-images.png',
+    },
+    bio: {
+      type: String,
+      default: '',
     },
     role: {
       type: String,
       enum: Object.keys(USER_ROLE),
       default: 'user',
     },
-    address: {
-      type: String,
-      required: true,
+    isUserPremium: {
+      type: Boolean,
+      default: false,
     },
     isDeleted: {
       type: Boolean,
       default: false,
     },
+    passwordChangeAt: {
+      type: Date,
+      default: Date.now(),
+    },
   },
   { timestamps: true },
 );
 
-// createdAt
+// Middleware to trim spaces in fields before save to DB
 
 // set password field "" when created user done
 userSchema.post('save', function () {

@@ -4,20 +4,27 @@ import catchAsync from '../../utils/catchAsync';
 import { sendApiResponse } from '../../utils/sendApiResponse';
 import { setRefreshTokenInCookie } from './auth.utils';
 
-const signup = catchAsync(async (req, res) => {
+const userRegistration = catchAsync(async (req, res) => {
   const {
     data: payload,
     accessToken,
     refreshToken,
-  } = await AuthServices.signupIntoDB(req.body);
+  } = await AuthServices.userRegistrationIntoDB(req.body);
 
+  // Set refresh token in cookie
   setRefreshTokenInCookie(res, refreshToken);
 
   sendApiResponse(res, {
     statusCode: httpStatus.CREATED,
-    message: `User registered successfully`,
+    message: `Welcome! Your account has been created successfully`,
     payload,
     accessToken,
+    links: {
+      login: {
+        method: 'POST',
+        href: '/auth/login',
+      },
+    },
   });
 });
 
@@ -62,7 +69,7 @@ const refreshToken = catchAsync(async (req, res) => {
 });
 
 export const AuthControllers = {
-  signup,
+  userRegistration,
   createAdminByAdmin,
   login,
   refreshToken,
