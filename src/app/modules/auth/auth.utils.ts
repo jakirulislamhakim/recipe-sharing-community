@@ -6,10 +6,12 @@ import { Response } from 'express';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 
+// generate hash password
 export const bcryptHashPassword = async (password: string) => {
   return await bcrypt.hash(password, Number(config.BCRYPT_SALT_ROUNDS));
 };
 
+// compare plain password with hash password
 export const bcryptComparePassword = async (
   plainTextPassword: string,
   hashPassword: string,
@@ -17,18 +19,28 @@ export const bcryptComparePassword = async (
   return await bcrypt.compare(plainTextPassword, hashPassword);
 };
 
+// generate jwt access token
 export const createJwtAccessToken = (jwtPayload: TJwtPayload) => {
   return jwt.sign(jwtPayload, config.JWT_ACCESS_SECRET_KEY as string, {
     expiresIn: config.JWT_ACCESS_EXP_TIME,
   });
 };
 
+// generate jwt refresh token
 export const createJwtRefreshToken = (jwtPayload: TJwtPayload) => {
   return jwt.sign(jwtPayload, config.JWT_REFRESH_SECRET_KEY as string, {
     expiresIn: config.JWT_REFRESH_EXP_TIME,
   });
 };
 
+// generate jwt reset access token
+export const createJwtResetToken = (jwtPayload: TJwtPayload) => {
+  return jwt.sign(jwtPayload, config.JWT_RESET_ACCESS_SECRET_KEY as string, {
+    expiresIn: config.JWT_RESET_ACCESS_EXP_TIME,
+  });
+};
+
+// includes refresh token cookie
 export const setRefreshTokenInCookie = (
   res: Response,
   refreshToken: string,
@@ -73,6 +85,25 @@ export const decodedRefreshToken = (refreshToken: string) => {
       httpStatus.UNAUTHORIZED,
       isTokenExpired
         ? 'Refresh token has expired. Please log in again.'
+        : 'Invalid token. Please provide valid authentication credentials.',
+    );
+  }
+};
+
+// this utils for validate refreshToken and return decoded value
+export const decodedResetToken = (resetToken: string) => {
+  try {
+    const decoded = jwt.verify(
+      resetToken,
+      config.JWT_RESET_ACCESS_SECRET_KEY as string,
+    ) as JwtPayload;
+    return decoded;
+  } catch (error) {
+    const isTokenExpired = error instanceof jwt.TokenExpiredError;
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      isTokenExpired
+        ? 'Reset token has expired! Please again forget your password'
         : 'Invalid token. Please provide valid authentication credentials.',
     );
   }

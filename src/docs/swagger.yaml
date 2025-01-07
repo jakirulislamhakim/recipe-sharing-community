@@ -99,10 +99,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/userDTO'
+              type: object
+              properties:
+                identifier:
+                  description: The username or email of the user.
+                  type: string
+                  example: hakim_h4
+                password:
+                  type: string
+                  example: 12345
+              required: ['identifier', 'password']
       responses:
         200:
-          description: Successfully created user
+          description: Successfully login user
           content:
             application/json:
               schema:
@@ -258,6 +267,39 @@ paths:
           $ref: '#/components/responses/401'
         403:
           $ref: '#/components/responses/403'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+  /auth/refresh:
+    post:
+      operationId: getNewAccessToken
+      tags:
+        - auth
+      summary: Get new access token by refresh token
+      responses:
+        200:
+          description: Get new access token using valid refresh token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: *successTrue
+                  message:
+                    type: string
+                    example: New access token retrieved successfully.
+                  accessToken:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImphaGlkdWxpc2xhbWhha2ltNTNAZ21haWwuY29tIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3MzYyNjYwODQsImV4cCI6MTczNjg3MDg4NH0.fPaTtBAAY5lcuw3Zko0gyTNQjICzK0VGhVd3o4VaPkg
+                  data:
+                    type: object
+                    properties:
+                      payload:
+                        type: object
+                        example: null
+        400:
+          $ref: '#/components/responses/400'
         404:
           $ref: '#/components/responses/404'
         500:
