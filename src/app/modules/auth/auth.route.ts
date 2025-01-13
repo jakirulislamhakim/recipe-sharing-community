@@ -44,4 +44,11 @@ router.post(
   AuthControllers.refreshToken,
 );
 
+// router.post(
+//   '/create-admin',
+//   auth(USER_ROLE.superAdmin),
+//   ValidateRequest(AuthValidations.userRegistrationValidationSchema),
+//   AuthControllers.createAdmin,
+// );
+
 export const AuthRoutes = router;

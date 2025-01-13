@@ -1,7 +1,11 @@
 import httpStatus from 'http-status';
 import { TUser, TUserRole } from '../user/user.interface';
 import { User } from '../user/user.model';
-import type { TChangePassword, TJwtPayload, TLoginUser } from './auth.interface';
+import type {
+  TChangePassword,
+  TJwtPayload,
+  TLoginUser,
+} from './auth.interface';
 import {
   bcryptComparePassword,
   bcryptHashPassword,

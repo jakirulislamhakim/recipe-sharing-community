@@ -66,7 +66,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: &successTrue
+                  success:
                     type: boolean
                     example: true
                   message:
@@ -107,7 +107,10 @@ paths:
                   example: hakim_h4
                 password:
                   type: string
-                  example: 12345
+                  minimum: 8
+                  maximum: 16
+                  pattern: ^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$
+                  example: Strong!Pass9
               required: ['identifier', 'password']
       responses:
         200:
@@ -117,7 +120,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Login successful. Welcome back!
@@ -152,10 +157,19 @@ paths:
               properties:
                 oldPassword:
                   type: string
-                  example: 12345
+                  minimum: 8
+                  maximum: 16
+                  pattern: ^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$
+                  format: password
+                  example: Strong!Pass9
                 newPassword:
                   type: string
+                  minimum: 8
+                  maximum: 16
+                  pattern: ^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$
+                  format: password
                   example: newPass123
+              required: ['oldPassword', 'newPassword']
       responses:
         200:
           description: Successfully change password
@@ -164,7 +178,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Your password has been successfully changed.
@@ -197,6 +213,7 @@ paths:
                 email:
                   type: string
                   example: hakim@gmail.com
+              required: ['email']
       responses:
         200:
           description: Requested forget password.
@@ -205,7 +222,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: We’ve sent you an email with instructions to reset your password.
@@ -240,7 +259,8 @@ paths:
               properties:
                 newPassword:
                   type: string
-                  example: newPass123
+                  example: New!Pass9
+              required: ['newPassword']
       responses:
         200:
           description: Password reset successfully.
@@ -249,7 +269,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Password has been successfully reset.
@@ -285,7 +307,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: New access token retrieved successfully.
@@ -322,7 +346,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: User profile information has been successfully retrieved.
@@ -368,7 +394,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: User profile information has been successfully updated.
@@ -404,6 +432,8 @@ paths:
               properties:
                 username:
                   type: string
+                  minimum: 4
+                  maximum: 20
                   example: hakim224242
               required: ['username']
       responses:
@@ -414,7 +444,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Your username has been successfully updated.
@@ -441,7 +473,7 @@ paths:
           $ref: '#/components/responses/500'
 
   # USER FOLLOWERS ROUTES
-  /users/follow:
+  /following:
     post:
       operationId: followingUser
       security:
@@ -459,7 +491,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: You are now following {username}!
@@ -494,7 +528,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: You have unfollowed {username}.
@@ -512,7 +548,6 @@ paths:
           $ref: '#/components/responses/404'
         500:
           $ref: '#/components/responses/500'
-  /users/following-and-followers?expand=following:
     get:
       operationId: getFollowingAndFollowers
       security:
@@ -521,13 +556,13 @@ paths:
         - follows
       summary: Logged in user get their following and followers list.
       parameters:
-        - in: query
-          name: expand
-          required: false
+        - name: expand
+          in: query
           schema:
             type: string
-            enum: ['following', 'followers', 'following,followers']
-          description: The user id of the user whose following and followers list you want to get.
+            enum: [following, followers, both]
+          required: false
+          description: The filter to apply (following, followers, or both).
       responses:
         200:
           description: Successfully get following and followers list
@@ -536,7 +571,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Your following list has been successfully retrieved.
@@ -552,21 +589,21 @@ paths:
                           followersCount:
                             type: number
                             example: 10
-                          followingDetails:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                _id:
-                                  type: string
-                                  example: 5f92cbf10cf217478ba56754
-                                username:
-                                  type: string
-                                  example: hakim224242
-                                profileImg:
-                                  type: string
-                                  format: url
-                                  example: https://i.ibb.co.com/4jr3Rn6/no-images.png
+                          # followingDetails:
+                          #   type: array
+                          #   items:
+                          #     type: object
+                          #     properties:
+                          #       _id:
+                          #         type: string
+                          #         example: 5f92cbf10cf217478ba56754
+                          #       username:
+                          #         type: string
+                          #         example: hakim224242
+                          #       profileImg:
+                          #         type: string
+                          #         format: url
+                          #         example: https://i.ibb.co.com/4jr3Rn6/no-images.png
         401:
           $ref: '#/components/responses/401'
         403:
@@ -595,7 +632,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Your recipe has been successfully posted!
@@ -631,7 +670,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: All recipes have been successfully retrieved.
@@ -664,7 +705,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Recipe has been successfully retrieved.
@@ -698,7 +741,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Your recipe has been successfully updated.
@@ -736,7 +781,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Your recipe has been successfully deleted.
@@ -775,7 +822,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Your posted recipes have been successfully retrieved.
@@ -795,7 +844,7 @@ paths:
         500:
           $ref: '#/components/responses/500'
   # ADMIN only route recipes route
-  /recipes/change-violation:
+  /recipes/violation:
     patch:
       operationId: changeViolationStatus
       security:
@@ -804,18 +853,8 @@ paths:
         - recipes
       summary: Only ADMIN can change violation status of a recipe.
       description: When user break the community guidelines, admin can change the violation status of the recipe. violations post only show who post the recipe.
-      parameters:
-        - '$ref': '#/components/parameters/idPathParam'
       requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                isViolation:
-                  type: boolean
-                  example: true
-              required: ['isViolation']
+        $ref: '#/components/requestBodies/recipeId'
       responses:
         200:
           description: Successfully updated violation status
@@ -824,7 +863,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Recipe violation status has been successfully updated.
@@ -875,7 +916,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Your rating has been successfully added.
@@ -910,7 +953,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Your rating has been successfully deleted.
@@ -937,7 +982,7 @@ paths:
         - ratings
       summary: Get all ratings by recipe id
       parameters:
-        - '$ref': '#/components/parameters/idPathParam'
+        - $ref: '#/components/parameters/recipeIdPathParam'
       responses:
         200:
           description: Successfully get all ratings for the recipe.
@@ -946,7 +991,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: All ratings have been successfully retrieved.
@@ -970,7 +1017,7 @@ paths:
         - ratings
       summary: Get average rating by recipe id
       parameters:
-        - '$ref': '#/components/parameters/idPathParam'
+        - '$ref': '#/components/parameters/recipeIdPathParam'
       responses:
         200:
           description: Successfully get average rating for the recipe.
@@ -979,7 +1026,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Average rating has been successfully retrieved for the recipe.
@@ -1002,16 +1051,29 @@ paths:
           $ref: '#/components/responses/500'
 
   # VOTES ROUTES
-  /recipes/{id}/upvote:
+  /votes:
     post:
       operationId: upvoteRecipe
       security:
         - bearerAuth: []
       tags:
         - votes
-      summary: Logged in user can upvote a recipe.
-      parameters:
-        - '$ref': '#/components/parameters/idPathParam'
+      summary: Logged in user can upvote or downvote a recipes.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    voteType:
+                      type: string
+                      enum: ['upvote , downvote']
+                      example: upvote
+                    recipe:
+                      type: string
+                      format: objectId
+                      example: 5f92cbf10cf217478ba93ere
       responses:
         201:
           description: Successfully upvoted recipe
@@ -1020,7 +1082,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Liked successfully. Share your thoughts in a comment!
@@ -1033,6 +1097,9 @@ paths:
                           totalUpvotes:
                             type: number
                             example: 127
+                          totalDownvotes:
+                            type: number
+                            example: 12
 
         400:
           $ref: '#/components/responses/400'
@@ -1042,13 +1109,14 @@ paths:
           $ref: '#/components/responses/404'
         500:
           $ref: '#/components/responses/500'
+  /votes/{id}/remove:
     delete:
       operationId: removeUpvote
       security:
         - bearerAuth: []
       tags:
         - votes
-      summary: Logged in user can remove their upvote from a recipe.
+      summary: Logged in user can remove their upvote or down from a recipe.
       parameters:
         - '$ref': '#/components/parameters/idPathParam'
       responses:
@@ -1059,7 +1127,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Your like has been removed.
@@ -1071,87 +1141,10 @@ paths:
                         properties:
                           totalUpvotes:
                             type: number
-                            example: 126
-        400:
-          $ref: '#/components/responses/400'
-        401:
-          $ref: '#/components/responses/401'
-        403:
-          $ref: '#/components/responses/403'
-        404:
-          $ref: '#/components/responses/404'
-        500:
-          $ref: '#/components/responses/500'
-  /recipes/{id}/downote:
-    post:
-      operationId: downvoteRecipe
-      security:
-        - bearerAuth: []
-      tags:
-        - votes
-      summary: Logged in user can downvote a recipe.
-      parameters:
-        - '$ref': '#/components/parameters/idPathParam'
-      responses:
-        201:
-          description: Successfully downvoted recipe
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success: *successTrue
-                  message:
-                    type: string
-                    example: Disliked successfully. Share your thoughts in a comment!
-                  data:
-                    type: object
-                    properties:
-                      payload:
-                        type: object
-                        properties:
+                            example: 125
                           totalDownvotes:
                             type: number
-                            example: 21
-
-        400:
-          $ref: '#/components/responses/400'
-        401:
-          $ref: '#/components/responses/401'
-        404:
-          $ref: '#/components/responses/404'
-        500:
-          $ref: '#/components/responses/500'
-    delete:
-      operationId: removeDownvote
-      security:
-        - bearerAuth: []
-      tags:
-        - votes
-      summary: Logged in user can remove their downvote from a recipe.
-      parameters:
-        - '$ref': '#/components/parameters/idPathParam'
-      responses:
-        200:
-          description: Successfully removed downvote
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success: *successTrue
-                  message:
-                    type: string
-                    example: Your downvote has been removed.
-                  data:
-                    type: object
-                    properties:
-                      payload:
-                        type: object
-                        properties:
-                          totalDownvotes:
-                            type: number
-                            example: 20
+                            example: 13
         400:
           $ref: '#/components/responses/400'
         401:
@@ -1164,7 +1157,7 @@ paths:
           $ref: '#/components/responses/500'
 
   # COMMENTS ROUTES
-  /recipes/{id}/comments:
+  /comments:
     post:
       operationId: addComment
       security:
@@ -1172,10 +1165,20 @@ paths:
       tags:
         - comments
       summary: Logged in user can add comment to a recipe.
-      parameters:
-        - '$ref': '#/components/parameters/idPathParam'
       requestBody:
-        $ref: '#/components/requestBodies/comment'
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recipe:
+                  type: string
+                  format: objectId
+                  example: 5f92cbf10cf217478ba93ere
+                body:
+                  type: string
+                  example: This is a great recipe. I will try it soon.
+               
       responses:
         201:
           description: Successfully added comment
@@ -1184,7 +1187,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Your comment has been successfully added.
@@ -1202,13 +1207,14 @@ paths:
           $ref: '#/components/responses/404'
         500:
           $ref: '#/components/responses/500'
+  /comments/{recipeId}: 
     get:
       operationId: getCommentsByRecipeId
       tags:
         - comments
       summary: Get all comments by recipe id
       parameters:
-        - '$ref': '#/components/parameters/idPathParam'
+        - '$ref': '#/components/parameters/recipeIdPathParam'
       responses:
         200:
           description: Successfully get all comments for the recipe.
@@ -1217,7 +1223,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: All comments have been successfully retrieved.
@@ -1234,6 +1242,7 @@ paths:
           $ref: '#/components/responses/404'
         500:
           $ref: '#/components/responses/500'
+  /comments/{id}:
     patch:
       operationId: updateComment
       security:
@@ -1253,7 +1262,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Your comment has been successfully updated.
@@ -1289,7 +1300,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Your comment has been successfully deleted.
@@ -1333,7 +1346,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Subscription plan has been successfully created.
@@ -1368,7 +1383,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: All subscription plans have been successfully retrieved.
@@ -1399,7 +1416,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Successfully deactivate subscription plan.
@@ -1447,7 +1466,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: You have successfully subscribed to the plan.
@@ -1482,7 +1503,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: All subscription details have been successfully retrieved.
@@ -1517,7 +1540,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: *successTrue
+                  success:
+                    type: boolean
+                    example: true
                   message:
                     type: string
                     example: Your subscription details has been successfully retrieved.
@@ -1540,13 +1565,26 @@ components:
   # security schemas
   securitySchemes:
     bearerAuth:
+      description: Use the JWT token received from /auth/login or /auth/register.
       type: http
       scheme: bearer
       bearerFormat: JWT
 
   # request body schemas
   requestBodies:
+    recipeId:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              recipe:
+                type: string
+                example: 5f92cbf10cf217478ba56754
+            required: ['followingId']
     followingUser:
+      required: true
       content:
         application/json:
           schema:
@@ -1628,10 +1666,6 @@ components:
               description:
                 type: string
                 example: Learn how to make perfect scrambled eggs with this easy recipe.
-            required:
-              - title
-              - status
-              - description
     comment:
       content:
         application/json:
@@ -1642,6 +1676,7 @@ components:
                 type: string
                 example: This is a great recipe. I will try it soon.
             required: ['body']
+
   # reusable all schemas
   schemas:
     userDTO:
@@ -1653,13 +1688,16 @@ components:
           example: hakim@gmail.com
         password:
           type: string
+          minimum: 8
+          maximum: 16
+          pattern: ^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$
           format: password
-          example: 12345
+          example: 12345Hi&ds
       required: ['email', 'password']
     userInfo:
       type: object
       properties:
-        _id: &_id
+        _id:
           type: string
           example: '2345jdfjhsdf3254hj5'
         username:
@@ -1675,7 +1713,9 @@ components:
     recipeInfo:
       type: object
       properties:
-        _id: *_id
+        _id:
+          type: string
+          example: '2345jdfjhsdf3254hj5'
         title:
           type: string
           example: Perfect Scrambled Eggs
@@ -1704,7 +1744,9 @@ components:
       allOf:
         - type: object
           properties:
-            _id: *_id
+            _id:
+              type: string
+              example: '2345jdfjhsdf3254hj5'
             fullName:
               type: string
               example: Jakirul Islam Hakim
@@ -1762,7 +1804,9 @@ components:
       allOf:
         - type: object
           properties:
-            _id: *_id
+            _id:
+              type: string
+              example: '2345jdfjhsdf3254hj5'
             user:
               $ref: '#/components/schemas/userInfo'
             title:
@@ -1806,7 +1850,7 @@ components:
                 - published
                 - unpublished
               example: published
-            isViolation:
+            isViolated:
               type: boolean
               default: false
             isPostPremium:
@@ -1839,7 +1883,9 @@ components:
     ratingSchema:
       type: object
       properties:
-        _id: *_id
+        _id:
+          type: string
+          example: '2345jdfjhsdf3254hj5'
         user:
           $ref: '#/components/schemas/userInfo'
         recipe:
@@ -1856,7 +1902,9 @@ components:
       allOf:
         - type: object
           properties:
-            _id: *_id
+            _id:
+              type: string
+              example: '2345jdfjhsdf3254hj5'
             user:
               $ref: '#/components/schemas/userInfo'
             recipe:
@@ -1884,7 +1932,9 @@ components:
     subscriptionSchema:
       allOf:
         - properties:
-            _id: *_id
+            _id:
+              type: string
+              example: '2345jdfjhsdf3254hj5'
             user:
               $ref: '#/components/schemas/userInfo'
             subscriptionPlan:
@@ -1982,7 +2032,7 @@ components:
           schema:
             type: object
             properties:
-              success: &successFalse
+              success:
                 type: boolean
                 example: false
               message:
@@ -2006,8 +2056,10 @@ components:
           schema:
             type: object
             properties:
-              success: *successFalse
-              message: &msg401
+              success:
+                type: boolean
+                example: false
+              message:
                 type: string
                 example: Authentication is required to access this resource.
               errorSources:
@@ -2018,7 +2070,9 @@ components:
                     path:
                       type: string
                       example: ''
-                    message: *msg401
+                    message:
+                      type: string
+                      example: Authentication is required to access this resource.
     403:
       description: Forbidden Error
       content:
@@ -2026,8 +2080,10 @@ components:
           schema:
             type: object
             properties:
-              success: *successFalse
-              message: &msg403
+              success:
+                type: boolean
+                example: false
+              message:
                 type: string
                 example: You do not have permission to access this resource.
               errorSources:
@@ -2038,7 +2094,9 @@ components:
                     path:
                       type: string
                       example: ''
-                    message: *msg403
+                    message:
+                      type: string
+                      example: You do not have permission to access this resource.
     404:
       description: Not Found Error
       content:
@@ -2046,8 +2104,10 @@ components:
           schema:
             type: object
             properties:
-              success: *successFalse
-              message: &msg404
+              success:
+                type: boolean
+                example: false
+              message:
                 type: string
                 example: Account not found. Please check your credentials or sign up.
               errorSources:
@@ -2058,7 +2118,9 @@ components:
                     path:
                       type: string
                       example: ''
-                    message: *msg404
+                    message:
+                      type: string
+                      example: Account not found. Please check your credentials or sign up.
     409:
       description: Conflict Error
       content:
@@ -2066,8 +2128,10 @@ components:
           schema:
             type: object
             properties:
-              success: *successFalse
-              message: &msg409
+              success:
+                type: boolean
+                example: false
+              message:
                 type: string
                 example: A user with this email already exists.
               errorSources:
@@ -2078,7 +2142,9 @@ components:
                     path:
                       type: string
                       example: ''
-                    message: *msg409
+                    message:
+                      type: string
+                      example: A user with this email already exists.
     500:
       description: Internal Server Error
       content:
@@ -2086,8 +2152,10 @@ components:
           schema:
             type: object
             properties:
-              success: *successFalse
-              message: &msg500
+              success:
+                type: boolean
+                example: false
+              message:
                 type: string
                 example: An unexpected error occurred. Please try again later.
               errorSources:
@@ -2098,11 +2166,21 @@ components:
                     path:
                       type: string
                       example: ''
-                    message: *msg500
+                    message:
+                      type: string
+                      example: An unexpected error occurred. Please try again later.
   # parameters
   parameters:
     idPathParam:
       name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: 5f92cbf10cf217478ba93ere
+      description: The ID of the resource to retrieve.
+    recipeIdPathParam:
+      name: recipeId
       in: path
       required: true
       schema:

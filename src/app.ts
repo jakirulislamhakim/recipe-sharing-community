@@ -8,8 +8,12 @@ import limiter from './app/middleware/limiter';
 import YAML from 'yamljs';
 import swaggerUi from 'swagger-ui-express';
 import path from 'path';
+import compression from 'compression';
 
 const app: Application = express();
+
+// reduce response size
+app.use(compression());
 
 // parsers
 app.use(express.json());
@@ -36,7 +40,7 @@ app.use('/api/v1', ModulesRoutes);
 const homeRoute = async (req: Request, res: Response) => {
   res.send({
     success: true,
-    message: 'Server is healthy!!',
+    message: 'H4 recipe community is running !',
   });
 };
 

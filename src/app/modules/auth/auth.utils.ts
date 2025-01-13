@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import config from '../../config';
-import { TJwtPayload } from './auth.interface';
+import type { TJwtPayload } from './auth.interface';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { Response } from 'express';
 import AppError from '../../errors/AppError';

@@ -38,6 +38,7 @@ const userRegistrationValidationSchema = z.object({
               'Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character',
           },
         )
+        .max(20, { message: "Passwords can't be longer than 20 characters." })
         .trim(),
     })
     .strict({
@@ -61,7 +62,8 @@ const loginValidationSchema = z.object({
             message:
               'Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character',
           },
-        ),
+        )
+        .max(20, { message: "Passwords can't be longer than 20 characters." }),
     })
     .refine(
       (data) =>
@@ -79,6 +81,7 @@ const changePasswordValidationSchema = z.object({
       .string({
         required_error: 'Old password is required',
       })
+      .max(20, { message: "Passwords can't be longer than 20 characters." })
       .regex(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
         {
@@ -90,13 +93,15 @@ const changePasswordValidationSchema = z.object({
       .string({
         required_error: 'New password is required',
       })
+      .max(20, { message: "Passwords can't be longer than 20 characters." })
       .regex(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
         {
           message:
             'Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character',
         },
-      ),
+      )
+      .max(20, { message: "Passwords can't be longer than 20 characters." }),
   }),
 });
 
@@ -123,6 +128,7 @@ const resetPasswordValidationSchema = z.object({
       .string({
         required_error: 'Password is required',
       })
+      .max(20, { message: "Passwords can't be longer than 20 characters." })
       .regex(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
         {
